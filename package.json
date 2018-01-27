@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "aws-sdk": "^2.186.0",
+    "amazon-cognito-identity-js": "^1.31.0",
+    "aws-sdk": "^2.188.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-google-login": "^3.0.4",
+    "react-materialize": "^1.1.2",
     "react-scripts": "1.1.0"
   },
   "scripts": {
