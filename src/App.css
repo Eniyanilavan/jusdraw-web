@@ -42,7 +42,7 @@
 div{
   height: 100%;
 }
-#upload{
+.upload{
   border: none;
   color: white;
   margin-left: 300px;
@@ -51,31 +51,31 @@ div{
   height: 30px;
   margin-top: 10px;
 }
-#upload:hover{
+.upload:hover{
   background-color: #206020;
 }
-#upload:active{
+.upload:active{
   background-color: #0d260d;
 }
-.App {
+.app {
   text-align: center;
 }
-.App-logo {
+.app-logo {
   height: 80px;
 }
 
-.App-header {
+.app-header {
   background-color: #222;
   height: 250px;
   padding: 20px;
   color: white;
 }
 
-.App-title {
+.app-title {
   font-size: 1.5em;
 }
 
-.App-intro {
+.app-intro {
   font-size: large;
 }
 .MainDiv{
