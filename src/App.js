@@ -3,7 +3,24 @@ import './App.css';
 import Tab from './component/tab';
 import {Button, Icon,Row,Input,Footer} from 'react-materialize';
 import { CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
+var AWS = require('aws-sdk');
+AWS.config.update({
+            region:'us-east-1',
+            credentials: {
+                accessKeyId: 'AKIAIAREXLVDXQEHEICQ',
+                secretAccessKey: '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',
+            }
+        });
 
+var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+const POOL_DATA = {
+  ClientId : '70qhoo3a6365msckj66ck02fbn',
+  UserPoolId : 'us-east-1_h7Lxkjzd8',
+}
+const userPool = new CognitoUserPool(POOL_DATA);
+var currentuser = userPool.getCurrentUser();
+let reader = new FileReader();
 class App extends Component {
   constructor()
   {
@@ -20,15 +37,40 @@ class App extends Component {
     };
   }
 
+upload = ()=>{
+    let file = document.getElementById('myFile').files[0];
+
+    var params = {
+    Body: reader.result,
+    Bucket: "com.jusdraw/"+currentuser['username'],
+    Key: file['name'],
+    ServerSideEncryption: "AES256",
+    Tagging: "key1=value1&key2=value2"
+   };
+   s3.putObject(params, function(err, data) {
+     if (err) alert(err);
+     else{
+      alert("Image upload successful");
+      var params = {
+      MessageBody: currentuser['username']+"/"+file['name'],
+      QueueUrl: 'https://sqs.us-east-1.amazonaws.com/362071517917/jusdraw',
+      DelaySeconds: 0,
+      };
+      sqs.sendMessage(params, function(err, data) {
+        if (err) console.log(err, err.stack);
+        else     console.log(data);
+      });
+     }
+   });
+}
+
+
+
+
+
+
 
 signUp =()=> {
-
-  const POOL_DATA = {
-    ClientId : '70qhoo3a6365msckj66ck02fbn',
-    UserPoolId : 'us-east-1_h7Lxkjzd8',
-  }
-
-  const userPool = new CognitoUserPool(POOL_DATA);
 
     const parm = {
       uname : document.getElementById('Username').value,
@@ -58,12 +100,6 @@ signUp =()=> {
     });
 }
 confirm = ()=>{
-  const POOL_DATA = {
-    ClientId : '70qhoo3a6365msckj66ck02fbn',
-    UserPoolId : 'us-east-1_h7Lxkjzd8',
-  }
-
-  const userPool = new CognitoUserPool(POOL_DATA);
 
   var userData = {
     Username: document.getElementById('username').value,
@@ -92,11 +128,7 @@ signIn=()=>{
      Username : document.getElementById('signinname').value,
      Password : document.getElementById('signinpassword').value,
    }
- const POOL_DATA = {
-   ClientId : '70qhoo3a6365msckj66ck02fbn',
-   UserPoolId : 'us-east-1_h7Lxkjzd8',
- }
- const userPool = new CognitoUserPool(POOL_DATA);
+
  var authenticationDetails = new AuthenticationDetails(authenticationData);
  var userData = {
    Username: document.getElementById('signinname').value,
@@ -126,7 +158,6 @@ browse = ()=>{
   a.click();
 }
 x=()=>{
-  let reader = new FileReader();
   let file = document.getElementById('myFile').files[0];
   reader.onloadend = () => {
     this.setState({
@@ -136,26 +167,17 @@ x=()=>{
       }
     );
   }
-  reader.readAsDataURL(file)
+  reader.readAsDataURL(file);
 }
 
-upload=()=>{
-
-}
 componentDidMount(){
   const that = this;
-  const POOL_DATA = {
-    ClientId : '70qhoo3a6365msckj66ck02fbn',
-    UserPoolId : 'us-east-1_h7Lxkjzd8',
-  }
-  const userPool = new CognitoUserPool(POOL_DATA);
-  const user = userPool.getCurrentUser();
-  if(!user)
+  if(!currentuser)
   {
 
   }
   else {
-    user.getSession((err, session)=>{
+    currentuser.getSession((err, session)=>{
       if(err){
 
       }
@@ -167,17 +189,13 @@ componentDidMount(){
     })
   }
 }
+componentDidUpdate(){
+  currentuser = userPool.getCurrentUser();
+}
 
 signout = ()=>{
-  const POOL_DATA = {
-    ClientId : '70qhoo3a6365msckj66ck02fbn',
-    UserPoolId : 'us-east-1_h7Lxkjzd8',
-  }
-  const userPool = new CognitoUserPool(POOL_DATA);
-
-  var cognitoUser = userPool.getCurrentUser();
-  cognitoUser.signOut();
-  this.setState({main:'none',islogin:true});
+  currentuser.signOut();
+  this.setState({main:'none',islogin:true,display:'none',innerTEXT:true});
 }
 
 
