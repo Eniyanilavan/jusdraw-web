@@ -7,8 +7,8 @@ var AWS = require('aws-sdk');
 AWS.config.update({
             region:'us-east-1',
             credentials: {
-                accessKeyId: 'AKIAIAREXLVDXQEHEICQ',
-                secretAccessKey: '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',
+                accessKeyId: 'AKIAI3KSWCPHFQOJ46DQ',
+                secretAccessKey: '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',
             }
         });
 
@@ -41,7 +41,7 @@ upload = ()=>{
     let file = document.getElementById('myFile').files[0];
 
     var params = {
-    Body: reader.result,
+    Body: file,
     Bucket: "com.jusdraw/"+currentuser['username'],
     Key: file['name'],
     ServerSideEncryption: "AES256",
@@ -63,11 +63,6 @@ upload = ()=>{
      }
    });
 }
-
-
-
-
-
 
 
 signUp =()=> {
